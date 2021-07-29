@@ -1,8 +1,12 @@
--- Trackpad input by Paul Hedderly
+-- Latch input by Paul Hedderly
 -- Expects two inputs - one master and one slave
 -- The first is to track a contolled input for example a
--- sound desk fader.
+-- sound desk fader. The output also goes to master so that you
+-- use a two way master map. You could have multiple masters
+-- *if* they are feedback controlled.
 -- The slave is for a fader on a non-motorised surface...
+-- There can be only one slave (although you can add more
+-- mappings using different channel sets for another surface)
 -- The idea is that the slave is not forwarded to the
 -- first/main output until it is close in value to the master
 -- This is to avoid sudden jumps when using a secondary
@@ -22,9 +26,8 @@
 --	script = latch.lua
 --	default-handler = latch
 --
---	x32.ch0.cc1 > latch.0.master
---	nanoK.ch0.cc1 > latch.0.slave
---	latch.0.latched > x32.ch0.cc1
+--	x32.ch0.cc{1..8} <> latch.{1..8}.master
+--	nanoK.ch0.cc{1..8} > latch.{1..8}.slave
 
 threshold=0.03
 saved={}
@@ -45,7 +48,7 @@ function latch(v)
 		diff=math.abs(v-saved[channel])
 		if diff < threshold then
 			saved[channel]=v
-			output(channel..".latched",v)
+			output(channel..".master",v)
 		end
 	end
 end
